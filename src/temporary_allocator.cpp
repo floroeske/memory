@@ -106,8 +106,8 @@ public:
     {
         for (auto ptr = first.load(); ptr; ptr = ptr->next_)
         {
-            auto value = false;
-            if (ptr->in_use_.compare_exchange_strong(value, true))
+            unsigned int value = 0;
+            if (ptr->in_use_.compare_exchange_strong(value, 1))
                 return static_cast<temporary_stack*>(ptr);
         }
 
@@ -129,7 +129,7 @@ public:
     {
         // stack should be empty now, so shrink_to_fit() clears all memory
         stack.stack_.shrink_to_fit();
-        stack.in_use_ = false; // mark as free
+        stack.in_use_ = 0; // mark as free
     }
 
     void destroy()
@@ -174,7 +174,7 @@ namespace
 #endif
 }
 
-detail::temporary_stack_list_node::temporary_stack_list_node(int) FOONATHAN_NOEXCEPT : in_use_(true)
+detail::temporary_stack_list_node::temporary_stack_list_node(int) FOONATHAN_NOEXCEPT : in_use_(1)
 {
     next_ = temporary_stack_list_obj.first.load();
     while (!temporary_stack_list_obj.first.compare_exchange_weak(next_, this))

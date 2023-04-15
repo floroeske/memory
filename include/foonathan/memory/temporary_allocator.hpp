@@ -58,7 +58,7 @@ namespace foonathan
             {
             public:
                 // doesn't add into list
-                temporary_stack_list_node() FOONATHAN_NOEXCEPT : in_use_(true)
+                temporary_stack_list_node() FOONATHAN_NOEXCEPT : in_use_(1)
                 {
                 }
 
@@ -70,7 +70,7 @@ namespace foonathan
 
             private:
                 temporary_stack_list_node* next_ = nullptr;
-                std::atomic<bool>          in_use_;
+                std::atomic_uint           in_use_;
 
                 friend temporary_stack_list;
             };
